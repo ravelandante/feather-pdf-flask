@@ -1,16 +1,19 @@
 #from pypdf import *
 from pypdf import PdfReader, PdfWriter
+import os
 
 class PDFOps:
 
-    def __init__(self, pdf_name):
-        pass
+    def __init__(self):
+        self.default_save = 'outputs/'
+        if not os.path.exists(self.default_save):
+            os.makedirs(self.default_save)
         
     def simple_merge(self, paths, out_name):
         merger = PdfWriter()
         for pdf in paths:
             merger.append(pdf)
-        merger.write(out_name)
+        merger.write(self.default_save + out_name)
         merger.close()
 
     def complex_merge(self, paths, out_name):
@@ -18,7 +21,7 @@ class PDFOps:
         open_pdfs = []
         for pdf in paths:
             open_pdfs.append(open(pdf, 'rb'))
-        merger.write(out_name)
+        merger.write(self.default_save + out_name)
         merger.close()
 
     def compress(self, paths, out_names):
@@ -30,7 +33,7 @@ class PDFOps:
                 page.compress_content_streams() # CPU intensive
                 writer.add_page(page)
         
-            with open(out_names[i], 'wb') as f:
+            with open(self.default_save + out_names[i], 'wb') as f:
                 writer.write(f)
         writer.close()
 
@@ -43,6 +46,6 @@ class PDFOps:
                     page.rotate(90)
                 writer.add_page(page)
         
-            with open(out_names[i], 'wb') as f:
+            with open(self.default_save + out_names[i], 'wb') as f:
                 writer.write(f)
         writer.close()
