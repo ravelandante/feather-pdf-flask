@@ -9,9 +9,10 @@
   - [ ] carryover to outputted PDFs
   - [ ] editing of metadata
 - [ ] complex PDF merging
-- [ ] PDF splitting/deleting
+- [x] PDF splitting/deleting
 - [ ] GUI front-end
 - [ ] cmdline option
 - [ ] read-mode (extract all text and display meaningfully)
   - [ ] PDF converter (to plaintext?)
 - [ ] replacing text
+- [ ] extracting range of pages
