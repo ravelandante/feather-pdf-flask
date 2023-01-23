@@ -12,43 +12,82 @@ class PDFOps:
         if not os.path.exists(self.default_out):       # create default output dir if it doesn't exist
             os.makedirs(self.default_out)
         
-    def simple_merge(self, paths, out_name):
-        merger = PdfWriter()
-        for pdf in paths:
-            merger.append(pdf)
-        merger.write(self.default_out + out_name)
-        merger.close()
+    def append(self, paths, out_name):
+        writer = PdfWriter()
 
-    def complex_merge(self, paths, out_name):
-        merger = PdfWriter()
+        for pdf in paths:
+            writer.append(pdf)
+        writer.write(self.default_out + out_name)
+        writer.close()
+
+    def merge(self, paths, out_name):
+        writer = PdfWriter()
+
         open_pdfs = []
         for pdf in paths:
             open_pdfs.append(open(pdf, 'rb'))
-        merger.write(self.default_out + out_name)
-        merger.close()
+        writer.write(self.default_out + out_name)
+        writer.close()
 
-    def compress(self, paths, out_names):
+    def compress(self, path, out_name):
         writer = PdfWriter()
 
-        for i, path in enumerate(paths):
-            reader = PdfReader(path)
-            for page in reader.pages:
-                page.compress_content_streams() # CPU intensive
-                writer.add_page(page)
+        reader = PdfReader(path)
+        for page in reader.pages:
+            page.compress_content_streams() # CPU intensive
+            writer.add_page(page)
         
-            with open(self.default_out + out_names[i], 'wb') as f:
+        with open(self.default_out + out_name, 'wb') as f:
+            writer.write(f)
+        writer.close()
+
+    def fix_rotation(self, path, out_name, type):
+        writer = PdfWriter()
+
+        reader = PdfReader(path)
+        for page in reader.pages:
+            while (page.rotation != type):
+                page.rotate(90)
+            writer.add_page(page)
+        
+            with open(self.default_out + out_name, 'wb') as f:
                 writer.write(f)
         writer.close()
 
-    def fix_rotation(self, paths, out_names, type):
+    def delete(self, path, pages, save_new=True):
         writer = PdfWriter()
-        for i, path in enumerate(paths):
-            reader = PdfReader(path)
-            for page in reader.pages:
-                while (page.rotation != type):
-                    page.rotate(90)
-                writer.add_page(page)
-        
-            with open(self.default_out + out_names[i], 'wb') as f:
+        reader = PdfReader(path)
+        select_pages = [i for i in range(0, len(reader.pages)) if i not in pages]
+
+        with open(path, 'rb') as f:
+            writer.append(f, select_pages)
+            out_name = path if not save_new else self.default_out + (path.split('/')[-1])[:-4] + '_deleted.pdf'
+            with open(out_name, 'wb') as f:
                 writer.write(f)
         writer.close()
+    
+    def split(self, path, splits):
+        reader = PdfReader(path)
+        l_split = 0
+
+        for i, split in enumerate(splits):
+            writer = PdfWriter()
+            with open(path, 'rb') as f:
+                writer.append(f, (l_split, split))
+                out_name = self.default_out + (path.split('/')[-1])[:-4] + '_' + str(i) + '.pdf'
+                with open(out_name, 'wb') as f:
+                    writer.write(f)
+            l_split = split
+            writer.close()
+
+            if i == len(splits) - 1:
+                writer = PdfWriter()
+                with open(path, 'rb') as f:
+                    writer.append(f, (l_split, len(reader.pages)))
+                    out_name = self.default_out + (path.split('/')[-1])[:-4] + '_' + str(i + 1) + '.pdf'
+                    with open(out_name, 'wb') as f:
+                        writer.write(f)
+                writer.close()
+        
+    def extract_range(self, path, out_name, range):
+        pass

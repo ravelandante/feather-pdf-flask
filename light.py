@@ -6,15 +6,25 @@ from PDFOps import PDFOps
 
 p = PDFOps()
 
-print('merge [in1.pdf,in2.pdf,...] [out.pdf]\ncompress [in1.pdf,in2.pdf,...] [out1.pdf,out2.pdf,...]\nfix_rotation [in1.pdf,in2.pdf,...] [out1.pdf,out2.pdf,...] [type]')
+#print('append [in1.pdf,in2.pdf,...] [out.pdf]\ncompress [in1.pdf,in2.pdf,...] [out1.pdf,out2.pdf,...]\nfix_rotation [in1.pdf,in2.pdf,...] [out1.pdf,out2.pdf,...] [type]')
 cmd = input().split(' ')
 
 if cmd[0] == 'merge':
-    p.simple_merge(cmd[1].split(','), cmd[2])
+    p.append(cmd[1].split(','), cmd[2])
+
 elif cmd[0] == 'compress':
-    p.compress(cmd[1].split(','), cmd[2].split(','))
+    p.compress(cmd[1], cmd[2])
+
 elif cmd[0] == 'fix_rotation':
     type = 0 if cmd[3] == 'p' else 90
-    out_names = cmd[2].split(',') if len(cmd[2]) > 1 else [cmd[2]]
+    p.fix_rotation(cmd[1], cmd[2], type)
 
-    p.fix_rotation(cmd[1].split(','), out_names, type)
+elif cmd[0] == 'delete':
+    pages = cmd[2].split(',') if len(cmd[2]) > 1 else [cmd[2]]
+    pages = [int(page) - 1 for page in pages]
+    p.delete(cmd[1], pages)
+
+elif cmd[0] == 'split':
+    splits = cmd[2].split(',') if len(cmd[2]) > 1 else [cmd[2]]
+    splits = [int(split) - 1 for split in splits]
+    p.split(cmd[1], splits)
