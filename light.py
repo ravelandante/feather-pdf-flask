@@ -1,3 +1,7 @@
+# Author: Fynn Young (ravelandante)
+# Creation Date: 23/01/2023
+# --------------------------------------
+
 from PDFOps import PDFOps
 
 p = PDFOps()
