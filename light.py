@@ -2,7 +2,7 @@
 # Creation Date: 23/01/2023
 # --------------------------------------
 
-from PDFOps import PDFOps
+from PDFOps import PdfOps
 
 
 print('q to quit')
@@ -12,17 +12,17 @@ while (True):
     if cmd[0] == 'q':
         break
 
-    p = PDFOps(cmd[1])
+    p = PdfOps(cmd[1])
 
     if cmd[0] == 'append':
-        p.append(cmd[1].split(','), cmd[2])
+        p.append(cmd[2].split(','))
 
     elif cmd[0] == 'compress':
-        p.compress(cmd[2])
+        p.compress()
 
-    elif cmd[0] == 'fix_rotation':
-        type = 0 if cmd[3] == 'p' else 90
-        p.fix_rotation(cmd[2], type)
+    elif cmd[0] == 'rotate':
+        type = 0 if cmd[2] == 'p' else 90
+        p.rotate(type)
 
     elif cmd[0] == 'delete':
         pages = cmd[2].split(',') if len(cmd[2]) > 1 else [cmd[2]]

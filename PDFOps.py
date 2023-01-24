@@ -6,14 +6,16 @@ from pypdf import PdfReader, PdfWriter
 import os
 
 
-class PDFOps:
+class PdfOps:
 
-    def __init__(self, path):
-        self.default_out = 'outputs/'
+    def __init__(self, path, default_out='outputs/'):
+        self.path = path
+        self.default_out = default_out
         # create default output dir if it doesn't exist
         if not os.path.exists(self.default_out):
             os.makedirs(self.default_out)
-        self.path = path
+        self.default_name = self.default_out + (self.path.split('/')[-1])[:-4]
+
         self.reader = PdfReader(self.path)
         self.writer = PdfWriter()
 
@@ -23,43 +25,49 @@ class PDFOps:
         self.writer = PdfWriter()
         self.reader = PdfReader(self.path)
 
-    def append(self, paths, out_name):
+    def write(self):
+        """Writes pages to PDF"""
+        pass
+
+    def append(self, paths):
         """Append multiple PDFs in order of paths"""
         self.writer.append(self.path)
         for pdf in paths:
             self.writer.append(pdf)
-        with open(self.default_out + out_name, 'wb') as f:
+        with open('{}_appended.pdf'.format(self.default_name), 'wb') as f:
             self.writer.write(f)
         self.reset()
 
-    def merge(self, paths, out_name):
+    def merge(self, paths):
         """Complex merging of PDFs"""
         open_pdfs = []
         for pdf in paths:
             open_pdfs.append(open(pdf, 'rb'))
-        with open(self.default_out + out_name, 'wb') as f:
+        with open('{}_merged.pdf'.format(self.default_name), 'wb') as f:
             self.writer.write(f)
         self.reset()
 
-    def compress(self, out_name):
+    def compress(self):
         """Compress a PDF"""
         for page in self.reader.pages:
             page.compress_content_streams()  # CPU intensive
             self.writer.add_page(page)
 
-        with open(self.default_out + out_name, 'wb') as f:
+        self.writer.add_metadata(self.reader.metadata)
+        with open('{}_compressed.pdf'.format(self.default_name), 'wb') as f:
             self.writer.write(f)
         self.reset()
 
-    def fix_rotation(self, out_name, type):
+    def rotate(self, type):
         """Change all pages in the PDF to the specified orientation"""
         for page in self.reader.pages:
             while (page.rotation != type):
                 page.rotate(90)
             self.writer.add_page(page)
 
-            with open(self.default_out + out_name, 'wb') as f:
-                self.writer.write(f)
+        self.writer.add_metadata(self.reader.metadata)
+        with open('{}_rotated.pdf'.format(self.default_name), 'wb') as f:
+            self.writer.write(f)
         self.reset()
 
     def delete(self, pages, save_new=True):
@@ -68,8 +76,8 @@ class PDFOps:
 
         with open(self.path, 'rb') as f:
             self.writer.append(f, select_pages)
-            out_name = self.path if not save_new else self.default_out + (self.path.split('/')[-1])[:-4] + '_deleted.pdf'
-            with open(out_name, 'wb') as f:
+            self.writer.add_metadata(self.reader.metadata)
+            with open(self.path if not save_new else '{}_deleted.pdf'.format(self.default_name), 'wb') as f:
                 self.writer.write(f)
         self.reset()
 
@@ -80,8 +88,8 @@ class PDFOps:
         for i, split in enumerate(splits):
             with open(self.path, 'rb') as f:
                 self.writer.append(f, (l_split, split))
-                out_name = self.default_out + (self.path.split('/')[-1])[:-4] + '_split_' + str(i) + '.pdf'
-                with open(out_name, 'wb') as f:
+                self.writer.add_metadata(self.reader.metadata)
+                with open('{}_split_{}.pdf'.format(self.default_name, i), 'wb') as f:
                     self.writer.write(f)
             l_split = split
             self.reset()
@@ -90,8 +98,8 @@ class PDFOps:
                 
                 with open(self.path, 'rb') as f:
                     self.writer.append(f, (l_split, len(self.reader.pages)))
-                    out_name = self.default_out + (self.path.split('/')[-1])[:-4] + '_split_' + str(i + 1) + '.pdf'
-                    with open(out_name, 'wb') as f:
+                    self.writer.add_metadata(self.reader.metadata)
+                    with open('{}_split_{}.pdf'.format(self.default_name, i), 'wb') as f:
                         self.writer.write(f)
                 self.reset()
 
@@ -100,7 +108,7 @@ class PDFOps:
         for range in ranges:
             with open(self.path, 'rb') as f:
                 self.writer.append(f, (range[0] - 1, range[1]))
-                out_name = self.default_out + (self.path.split('/')[-1])[:-4] + '_range_' + str(range[0]) + '-' + str(range[1]) + '.pdf'
-                with open(out_name, 'wb') as f:
+                self.writer.add_metadata(self.reader.metadata)
+                with open('{}_split_{}-{}.pdf'.format(self.default_name, range[0], range[1]), 'wb') as f:
                     self.writer.write(f)
             self.reset()
