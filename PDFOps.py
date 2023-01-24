@@ -5,13 +5,15 @@
 from pypdf import PdfReader, PdfWriter
 import os
 
+
 class PDFOps:
 
     def __init__(self):
         self.default_out = 'outputs/'
-        if not os.path.exists(self.default_out):       # create default output dir if it doesn't exist
+        # create default output dir if it doesn't exist
+        if not os.path.exists(self.default_out):
             os.makedirs(self.default_out)
-        
+
     def append(self, paths, out_name):
         writer = PdfWriter()
 
@@ -34,9 +36,9 @@ class PDFOps:
 
         reader = PdfReader(path)
         for page in reader.pages:
-            page.compress_content_streams() # CPU intensive
+            page.compress_content_streams()  # CPU intensive
             writer.add_page(page)
-        
+
         with open(self.default_out + out_name, 'wb') as f:
             writer.write(f)
         writer.close()
@@ -49,7 +51,7 @@ class PDFOps:
             while (page.rotation != type):
                 page.rotate(90)
             writer.add_page(page)
-        
+
             with open(self.default_out + out_name, 'wb') as f:
                 writer.write(f)
         writer.close()
@@ -57,7 +59,8 @@ class PDFOps:
     def delete(self, path, pages, save_new=True):
         writer = PdfWriter()
         reader = PdfReader(path)
-        select_pages = [i for i in range(0, len(reader.pages)) if i not in pages]
+        select_pages = [i for i in range(
+            0, len(reader.pages)) if i not in pages]
 
         with open(path, 'rb') as f:
             writer.append(f, select_pages)
@@ -65,7 +68,7 @@ class PDFOps:
             with open(out_name, 'wb') as f:
                 writer.write(f)
         writer.close()
-    
+
     def split(self, path, splits):
         reader = PdfReader(path)
         l_split = 0
@@ -74,7 +77,7 @@ class PDFOps:
             writer = PdfWriter()
             with open(path, 'rb') as f:
                 writer.append(f, (l_split, split))
-                out_name = self.default_out + (path.split('/')[-1])[:-4] + '_' + str(i) + '.pdf'
+                out_name = self.default_out + (path.split('/')[-1])[:-4] + '_split_' + str(i) + '.pdf'
                 with open(out_name, 'wb') as f:
                     writer.write(f)
             l_split = split
@@ -84,10 +87,17 @@ class PDFOps:
                 writer = PdfWriter()
                 with open(path, 'rb') as f:
                     writer.append(f, (l_split, len(reader.pages)))
-                    out_name = self.default_out + (path.split('/')[-1])[:-4] + '_' + str(i + 1) + '.pdf'
+                    out_name = self.default_out + (path.split('/')[-1])[:-4] + '_split_' + str(i + 1) + '.pdf'
                     with open(out_name, 'wb') as f:
                         writer.write(f)
                 writer.close()
-        
-    def extract_range(self, path, out_name, range):
-        pass
+
+    def extract_range(self, path, ranges):
+        for i, range in enumerate(ranges):
+            writer = PdfWriter()
+            with open(path, 'rb') as f:
+                writer.append(f, (range[0] - 1, range[1]))
+                out_name = self.default_out + (path.split('/')[-1])[:-4] + '_range_' + str(range[0]) + '-' + str(range[1]) + '.pdf'
+                with open(out_name, 'wb') as f:
+                    writer.write(f)
+            writer.close()
