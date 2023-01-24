@@ -11,8 +11,8 @@
 - [ ] complex PDF merging
 - [x] PDF splitting/deleting
 - [ ] GUI front-end
-- [ ] cmdline option
+- [ ] CLI option
 - [ ] read-mode (extract all text and display meaningfully)
   - [ ] PDF converter (to plaintext?)
 - [ ] replacing text
-- [ ] extracting range of pages
+- [x] extracting range of pages
