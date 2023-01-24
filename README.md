@@ -6,7 +6,7 @@
   - [x] PDF compressing
   - [ ] removing images
 - [ ] metadata
-  - [ ] carryover to outputted PDFs
+  - [x] carryover to outputted PDFs
   - [ ] editing of metadata
 - [ ] complex PDF merging
 - [x] PDF splitting/deleting
