@@ -40,4 +40,13 @@ while (True):
             dash = range.find('-')
             ranges[i] = (int(range[0:dash]), int(range[dash + 1:]))
         p.extract_range(ranges)
+    
+    elif cmd[0] == 'metadata':
+        metadata = {}
+        metadata.update({'/Title': input('Title: ')})
+        metadata.update({'/Author': input('Author: ')})
+        metadata.update({'/Producer': input('Producer: ')})
+        metadata.update({'/Creator': input('Creator: ')})
+        metadata.update({'/Subject': input('Subject: ')})
+        p.edit_metadata(metadata)
     print('DONE')

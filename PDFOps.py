@@ -36,7 +36,6 @@ class PdfOps:
             self.writer.append(pdf)
         with open('{}_appended.pdf'.format(self.default_name), 'wb') as f:
             self.writer.write(f)
-        self.reset()
 
     def merge(self, paths):
         """Complex merging of PDFs"""
@@ -45,7 +44,6 @@ class PdfOps:
             open_pdfs.append(open(pdf, 'rb'))
         with open('{}_merged.pdf'.format(self.default_name), 'wb') as f:
             self.writer.write(f)
-        self.reset()
 
     def compress(self):
         """Compress a PDF"""
@@ -56,7 +54,6 @@ class PdfOps:
         self.writer.add_metadata(self.reader.metadata)
         with open('{}_compressed.pdf'.format(self.default_name), 'wb') as f:
             self.writer.write(f)
-        self.reset()
 
     def rotate(self, type):
         """Change all pages in the PDF to the specified orientation"""
@@ -68,7 +65,6 @@ class PdfOps:
         self.writer.add_metadata(self.reader.metadata)
         with open('{}_rotated.pdf'.format(self.default_name), 'wb') as f:
             self.writer.write(f)
-        self.reset()
 
     def delete(self, pages, save_new=True):
         """Delete given pages in the PDF"""
@@ -79,7 +75,6 @@ class PdfOps:
             self.writer.add_metadata(self.reader.metadata)
             with open(self.path if not save_new else '{}_deleted.pdf'.format(self.default_name), 'wb') as f:
                 self.writer.write(f)
-        self.reset()
 
     def split(self, splits):
         """Split the PDF at given pages and output 2 new PDFs for each split"""
@@ -112,3 +107,10 @@ class PdfOps:
                 with open('{}_split_{}-{}.pdf'.format(self.default_name, range[0], range[1]), 'wb') as f:
                     self.writer.write(f)
             self.reset()
+
+    def edit_metadata(self, metadata):
+        for page in self.reader.pages:
+            self.writer.add_page(page)
+        self.writer.add_metadata(metadata)
+        with open('{}_metadata.pdf'.format(self.default_name), 'wb') as f:
+            self.writer.write(f)
