@@ -5,14 +5,18 @@
         <h1>{{ operation }}</h1>
     </head>
     <body>
-        <!--<label for="start">Select a PDF to append to:</label>
-        <input type="file" id="start" name="start">!-->
-        <form action = "/uploader" method="post" enctype="multipart/form-data">
-            <div><label for="file">Select a PDF to append to:</label>
-            <input type="file" id="file" name="file"></div>
-            {% block content %}{% endblock %}
+        <form method="POST" enctype="multipart/form-data">
+            <div><label for="file">Select a PDF to append to:</label></div>
+            <div><input type="file" id="file" name="file" accept=".pdf", multiple="multiple"></div>
             <div><input type = "submit", value="Upload"/></div>
+            <div>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                    {{ message }}
+                    {% endfor %}
+                {% endif %}
+                {% endwith %}</div>
         </form> 
-        
     </body>
 </html>
