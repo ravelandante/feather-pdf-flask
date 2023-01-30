@@ -1,0 +1,18 @@
+<!doctype html>
+<title>PDF - {{ operation }}</title>
+<html>
+    <head>
+        <h1>{{ operation }}</h1>
+    </head>
+    <body>
+        <!--<label for="start">Select a PDF to append to:</label>
+        <input type="file" id="start" name="start">!-->
+        <form action = "/uploader" method="post" enctype="multipart/form-data">
+            <div><label for="file">Select a PDF to append to:</label>
+            <input type="file" id="file" name="file"></div>
+            {% block content %}{% endblock %}
+            <div><input type = "submit", value="Upload"/></div>
+        </form> 
+        
+    </body>
+</html>
