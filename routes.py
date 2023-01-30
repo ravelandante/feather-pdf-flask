@@ -30,9 +30,13 @@ def append():
             if file:
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            paths.append('upload/' + file.filename)
+            paths.append(os.path.join('upload/', file.filename))
+        # append uploaded files
         p = PdfOps(paths[0])
         p.append(paths[1:])
+        # remove uploaded files
+        for file in paths:
+            os.remove(file)
     return render_template('ops.html', operation='Append')
 
 @app.route('/output')
